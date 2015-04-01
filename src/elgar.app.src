@@ -1,0 +1,11 @@
+{application, elgar,
+ [
+  {description, "Erlang Genetic Algorithms Framework"},
+  {vsn, ""},
+  {registered, []},
+  {applications, [
+                  kernel,
+                  stdlib
+                 ]},
+  {env, []}
+ ]}.
