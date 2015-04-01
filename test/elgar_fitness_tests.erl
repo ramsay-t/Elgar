@@ -2,8 +2,6 @@
 
 -include_lib("eunit/include/eunit.hrl").
 
--compile(export_all).
-
 pop1() ->
     ["a","abc","dd"].
 
@@ -22,9 +20,15 @@ score_test_() ->
 	       Pid ! terminate,
 	       ok
        end,
-       [{"Scoring and Sorting", ?_assertEqual([{0.3,"abc"},{0.2,"dd"},{0.1,"a"}],elgar_fitness:score(pop1(),fun f/1))},
-	{"Null population", ?_assertEqual([],elgar_fitness:score([],fun f/1))}
-	]
+	{inorder,
+	 [{timeout, 10,
+	   {"Scoring and Sorting", ?_assertEqual([{0.3,"abc"},{0.2,"dd"},{0.1,"a"}],elgar_fitness:score(pop1(),fun f/1))}
+	  },
+	  {timeout, 10,
+	   {"Null population", ?_assertEqual([],elgar_fitness:score([],fun f/1))}
+	  }
+	 ]}
+       
       }
      ]
     }.
