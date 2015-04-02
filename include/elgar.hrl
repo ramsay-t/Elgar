@@ -5,3 +5,5 @@
 -type generator() :: fun((float()) -> genome()).
 
 -type mutation_function() :: fun((genome()) -> genome()).
+
+-type crossover_function() :: fun((genome(),genome()) -> genome()).
