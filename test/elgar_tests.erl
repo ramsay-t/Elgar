@@ -102,13 +102,25 @@ string_test_() ->
     }.
 
 options_test_() ->
-    {"String guessing GA with options",
-     {timeout, 10,
-      begin 
-	  Pids = start_workers(),
-	  Res = elgar:run(fun string_gen/1,fun(S) -> string_fit("abcde",S) end,string_mus(),fun string_cross/2,[{pop_size,40},{thres,1.0}]),
-	  stop_workers(Pids),
-	  ?_assertEqual("abcde", Res)
-      end}
+    {inorder,
+     [{"String guessing GA with options",
+       {timeout, 10,
+	begin 
+	    Pids = start_workers(),
+	    Res = elgar:run(fun string_gen/1,fun(S) -> string_fit("abcde",S) end,string_mus(),fun string_cross/2,[{pop_size,40},{thres,1.0}]),
+	    stop_workers(Pids),
+	    ?_assertEqual("abcde", Res)
+	end}
+      },
+      {"String guessing GA with minimal population size and monitor",
+       {timeout, 10,
+	begin 
+	    Pids2 = start_workers(),
+	    Res2 = elgar:run(fun string_gen/1,fun(S) -> string_fit("a",S) end,string_mus(),fun string_cross/2,[{pop_size,1},{thres,1.0},{monitor,5433}]),
+	    stop_workers(Pids2),
+	    ?_assertEqual("a", Res2)
+	end}
+      }
+     ]
     }.
 

@@ -39,7 +39,6 @@ loop(Pop,Fit,Mus,Cross,Thres,MonPid,Counter) ->
     end.
 
 update_status(MonPid,Status,Counter) ->
-    timer:sleep(100),
     case MonPid of
 	none ->
 	    ok;
@@ -47,6 +46,8 @@ update_status(MonPid,Status,Counter) ->
 	    if Status == finished ->
 		    MonPid ! terminate;
 	       true ->
+		    %% Prevent flooding of the monitor
+		    timer:sleep(100),
 		    StatMsg = lists:flatten(io_lib:format("Iteration: ~p<br/>\n",[Counter]) ++ 
 						lists:map(fun({S,P}) -> io_lib:format("~.6f ~p</br>",[S,P]) end,Status)),
 		    MonPid ! {status,StatMsg}
