@@ -1,6 +1,7 @@
 -module(elgar_tests).
 
 -include_lib("eunit/include/eunit.hrl").
+-compile(export_all).
 
 start_workers() ->
     lists:map(fun(_) -> sk_peasant:start() end, lists:seq(1,10)).
@@ -42,8 +43,7 @@ best_right(Target,S,Best) ->
 	    end
     end.
 
-string_fit(S) ->
-    Target = "abcde",
+string_fit(Target,S) ->
     if S == Target ->
 	    1.0;
        true ->
@@ -63,9 +63,17 @@ string_m1(S) ->
     S ++ [pick_char()].
 string_m2(S) ->
     [pick_char() | S].
+string_m3(S) ->
+    if length(S) > 1 ->
+	    N = random:uniform(length(S))-1,
+	    {A,B} = lists:split(N,S),
+	    A ++ [pick_char()] ++ tl(B);
+       true ->
+	    []
+    end.
 
 string_mus() ->
-    [fun string_m1/1, fun string_m2/1].
+    [fun string_m1/1, fun string_m2/1, fun string_m3/1].
 
 string_cross(P,Q) ->
     {F,_} = case P of
@@ -87,7 +95,7 @@ string_test_() ->
      {timeout, 10,
       begin 
 	  Pids = start_workers(),
-	  Res = elgar:run(fun string_gen/1,fun string_fit/1,string_mus(),fun string_cross/2,[]),
+	  Res = elgar:run(fun string_gen/1,fun(S) -> string_fit("abcde",S) end,string_mus(),fun string_cross/2,[]),
 	  stop_workers(Pids),
 	  ?_assertEqual("abcde", Res)
       end}
@@ -98,7 +106,7 @@ options_test_() ->
      {timeout, 10,
       begin 
 	  Pids = start_workers(),
-	  Res = elgar:run(fun string_gen/1,fun string_fit/1,string_mus(),fun string_cross/2,[{pop_size,40},{thres,1.0}]),
+	  Res = elgar:run(fun string_gen/1,fun(S) -> string_fit("abcde",S) end,string_mus(),fun string_cross/2,[{pop_size,40},{thres,1.0}]),
 	  stop_workers(Pids),
 	  ?_assertEqual("abcde", Res)
       end}

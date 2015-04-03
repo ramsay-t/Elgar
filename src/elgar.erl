@@ -3,30 +3,60 @@
 -export([run/5]).
 
 run(Gen,Fit,Mus,Cross,Options) ->
-    PopSize = case lists:keyfind(pop_size,1,Options) of
-		  {pop_size,P} ->
-		      P;
-		  _ ->
-		      10
+    MonPid = case get_opt(Options,monitor,none) of
+		 none ->
+		     none;
+		 Port ->
+		     elgar_monitor:start(Port)
+	     end,
+    PopSize = case get_opt(Options,pop_size,10) of
+		  S when S < 4 ->
+		      4;
+		  S ->
+		      S
 	      end,
+    
     Pop = elgar_generator:gen(Gen,PopSize),
-    Thres = case lists:keyfind(thres,1,Options) of
-		  {thres,T} ->
-		      T;
-		  _ ->
-		      1.0
-	      end,
-    loop(Pop,Fit,Mus,Cross,Thres).
+    Thres = get_opt(Options,thres,1.0),
+    loop(Pop,Fit,Mus,Cross,Thres,MonPid,1).
 
-loop(Pop,Fit,Mus,Cross,Thres) ->    
+loop(Pop,Fit,Mus,Cross,Thres,MonPid,Counter) ->    
     PopSize = length(Pop),
     PopP = elgar_mutation:make_mutants(Pop,PopSize,Mus) ++ elgar_crossover:cross(Pop,Cross),
     [{S,P} | ScoreSet] = elgar_fitness:score(PopP,Fit),
     if S >= Thres ->
+	    update_status(MonPid,finished,Counter),
 	    P;
        true ->
-	    {SH,_} = lists:split(PopSize,ScoreSet),
-	    NewPop = lists:map(fun({_,PP}) -> PP end,SH),
-	    loop(NewPop,Fit,Mus,Cross,Thres)
+	    {SH,_} = lists:split(PopSize-3,ScoreSet),
+	    %% Include two from the middle too - this adds some necessary diversity!
+	    {_,Worse} = lists:split(trunc(length(ScoreSet)/2),ScoreSet),
+	    {_,Worst} = lists:split(trunc(length(Worse)/2),Worse),
+	    SHP = [{S,P} | SH] ++ [hd(Worse),hd(Worst)],
+	    update_status(MonPid,SHP,Counter),
+	    NewPop = lists:map(fun({_,PP}) -> PP end,SHP),
+	    loop(NewPop,Fit,Mus,Cross,Thres,MonPid,Counter+1)
     end.
 
+update_status(MonPid,Status,Counter) ->
+    timer:sleep(100),
+    case MonPid of
+	none ->
+	    ok;
+	_ ->
+	    if Status == finished ->
+		    MonPid ! terminate;
+	       true ->
+		    StatMsg = lists:flatten(io_lib:format("Iteration: ~p<br/>\n",[Counter]) ++ 
+						lists:map(fun({S,P}) -> io_lib:format("~.6f ~p</br>",[S,P]) end,Status)),
+		    MonPid ! {status,StatMsg}
+	    end
+    end.
+
+get_opt(Options,O,Default) ->
+    case lists:keyfind(O,1,Options) of
+	{O,P} ->
+	    P;
+	_ ->
+	    Default
+    end.
