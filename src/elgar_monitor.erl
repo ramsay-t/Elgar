@@ -32,7 +32,7 @@ accept(ListenSocket,Clients,Status) ->
 		    accept(ListenSocket,Clients,Status)
 	    end;
 	{error,closed} ->
-	    io:format("MONITOR ACCEPT SOCKET CLOSED.~n");
+	    ok;
 	Error ->
 	    io:format("MONITOR ACCEPT ERROR: ~p~n",[Error]),
 	    gen_tcp:close(ListenSocket),
