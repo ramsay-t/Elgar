@@ -6,4 +6,4 @@
 
 -spec gen(generator(),pos_integer()) -> [genome()].
 gen(Gen,PopSize) ->
-    lists:map(fun(_) -> Gen(random:uniform()) end, lists:seq(1,PopSize)).
+    skel:do([{pool, [fun(_) -> Gen(random:uniform()) end], {max,PopSize}}], lists:seq(1,PopSize)).
