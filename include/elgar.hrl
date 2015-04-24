@@ -1,6 +1,6 @@
 -type genome() :: any().
 
--type fitness_function() :: fun((genome()) -> integer()).
+-type fitness_function() :: fun((genome()) -> float()).
 
 -type generator() :: fun((float()) -> genome()).
 

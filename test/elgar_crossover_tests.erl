@@ -17,7 +17,25 @@ string_cross(P,Q) ->
 	    end,
     F ++ S.
 
-string_cross_test() ->
-    PopP = elgar_crossover:cross(["aaa","bbb","abc"],fun string_cross/2),
-    ?assertEqual(9,length(PopP)).
+string_cross_test_() ->
+    {"Test Crossover",
+     [
+      {setup,
+       fun() ->
+	       Pid = sk_peasant:start(),
+	       Pid
+       end,
+       fun(Pid) ->
+	       Pid ! terminate,
+	       ok
+       end,
+	{inorder,
+	 [{timeout, 10,
+	   begin
+	       PopP = elgar_crossover:cross(["aaa","bbb","abc"],fun string_cross/2),
+	       ?_assertEqual(9,length(PopP))
+	   end}
+	 ]}
+      }]
+    }.
 

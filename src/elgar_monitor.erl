@@ -21,6 +21,8 @@ accept(ListenSocket,Clients,Status) ->
 	    receive
 		terminate ->
 		    io:format("Shutting down monitor.~n"),
+		    %% Wait 1s so the webpage updates to finished...
+		    timer:sleep(1000),
 		    lists:map(fun(C) -> C ! terminate end, Clients),
 		    gen_tcp:close(ListenSocket);
 		{status,NewStatus} ->
