@@ -9,7 +9,7 @@ run(Gen,Fit,Mus,Cross,Options) ->
 		 Port ->
 		     elgar_monitor:start(Port)
 	     end,
-    PopSize = case get_opt(Options,pop_size,10) of
+    PopSize = case get_opt(Options,pop_size,50) of
 		  S when S < 4 ->
 		      4;
 		  S ->

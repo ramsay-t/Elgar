@@ -2,7 +2,7 @@
 
 -include_lib("eunit/include/eunit.hrl").
 
-string_cross(P,Q) ->
+sc(P,Q) ->
     {F,_} = case P of
 		[] ->
 		    {[],[]};
@@ -17,25 +17,21 @@ string_cross(P,Q) ->
 	    end,
     F ++ S.
 
-string_cross_test_() ->
-    {"Test Crossover",
+cross_test_() ->
+    {"Crossover tests",
      [
       {setup,
        fun() ->
+	       ?debugMsg("Crossover Setup"),
 	       Pid = sk_peasant:start(),
 	       Pid
        end,
        fun(Pid) ->
 	       Pid ! terminate,
+	       timer:sleep(100),
 	       ok
        end,
-	{inorder,
-	 [{timeout, 10,
-	   begin
-	       PopP = elgar_crossover:cross(["aaa","bbb","abc"],fun string_cross/2),
-	       ?_assertEqual(9,length(PopP))
-	   end}
-	 ]}
+       {timeout, 10,{"String Crossover", ?_assertEqual(9,length(elgar_crossover:cross(["aaa","bbb","abc"],fun sc/2)))}
+       }
       }]
     }.
-
