@@ -15,12 +15,15 @@ run(Gen,Fit,Mus,Cross,Options) ->
 		  S ->
 		      S
 	      end,
-    
+    Limit = get_opt(Options,limit,100),
     Pop = elgar_generator:gen(Gen,PopSize),
     Thres = get_opt(Options,thres,1.0),
-    loop(Pop,Fit,Mus,Cross,Thres,MonPid,1).
+    loop(Pop,Fit,Mus,Cross,Thres,MonPid,Limit,1).
 
-loop(Pop,Fit,Mus,Cross,Thres,MonPid,Counter) ->    
+loop(Pop,_Fit,_Mus,_Cross,_Thres,MonPid,Limit,Counter) when Counter >= Limit ->
+    update_status(MonPid,finished,Counter),
+    hd(Pop);
+loop(Pop,Fit,Mus,Cross,Thres,MonPid,Limit,Counter) ->    
     PopSize = length(Pop),
     PopP = elgar_mutation:make_mutants(Pop,PopSize,Mus) ++ elgar_crossover:cross(Pop,Cross),
     [{S,P} | ScoreSet] = elgar_fitness:score(PopP,Fit),
@@ -35,7 +38,7 @@ loop(Pop,Fit,Mus,Cross,Thres,MonPid,Counter) ->
 	    SHP = [{S,P} | SH] ++ [hd(Worse),hd(Worst)],
 	    update_status(MonPid,SHP,Counter),
 	    NewPop = lists:map(fun({_,PP}) -> PP end,SHP),
-	    loop(NewPop,Fit,Mus,Cross,Thres,MonPid,Counter+1)
+	    loop(NewPop,Fit,Mus,Cross,Thres,MonPid,Limit,Counter+1)
     end.
 
 update_status(MonPid,Status,Counter) ->
