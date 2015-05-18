@@ -131,6 +131,11 @@ options_test_() ->
 	 %% This doesn't work with a as the target, but does with c. Thats very broken but I don't have time to look in to why...
 	 ?_assertEqual("c", elgar:run(fun string_gen/1,fun(S) -> string_fit("c",S) end,string_mus(),fun string_cross/2,[{pop_size,1},{thres,1.0},{monitor,5433}]))
 	}
+       },
+       {"Hit limit",
+	{timeout, 200,
+	 ?_assertMatch({incomplete,_}, elgar:run(fun string_gen/1,fun(S) -> string_fit("c",S) end,string_mus(),fun string_cross/2,[{pop_size,1},{thres,1.0},{limit,1}]))
+	}
        }
       ]}
      }.

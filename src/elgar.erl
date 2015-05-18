@@ -22,7 +22,7 @@ run(Gen,Fit,Mus,Cross,Options) ->
 
 loop(Pop,_Fit,_Mus,_Cross,_Thres,MonPid,Limit,Counter) when Counter >= Limit ->
     update_status(MonPid,finished,Counter),
-    hd(Pop);
+    {incomplete,hd(Pop)};
 loop(Pop,Fit,Mus,Cross,Thres,MonPid,Limit,Counter) ->    
     PopSize = length(Pop),
     PopP = elgar_mutation:make_mutants(Pop,PopSize,Mus) ++ elgar_crossover:cross(Pop,Cross),
