@@ -31,7 +31,7 @@ loop(Pop,Fit,Mus,Cross,Thres,MonPid,Limit,Counter) ->
 	    update_status(MonPid,finished,Counter),
 	    P;
        true ->
-	    {SH,_} = lists:split(PopSize-3,ScoreSet),
+	    {SH,_} = lists:split(min(PopSize-3,length(ScoreSet)),ScoreSet),
 	    %% Include two from the middle too - this adds some necessary diversity!
 	    {_,Worse} = lists:split(trunc(length(ScoreSet)/2),ScoreSet),
 	    {_,Worst} = lists:split(trunc(length(Worse)/2),Worse),
