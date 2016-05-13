@@ -5,10 +5,21 @@
 % Spawn exports
 -export([accept/3,recv/2]).
 
+start(any) ->
+    try_start(5000);
 start(Port) ->
     io:format("Starting Elgar Monitor on port ~p~n",[Port]),
     {ok, ListenSocket} = gen_tcp:listen(Port,[list,inet]),
     spawn(?MODULE,accept,[ListenSocket,[],{erlang:timestamp(),"starting..."}]).
+
+try_start(Port) ->
+    case gen_tcp:listen(Port,[list,inet]) of
+	{ok, ListenSocket} ->
+	    io:format("Starting Elgar Monitor on port ~p~n",[Port]),
+	    spawn(?MODULE,accept,[ListenSocket,[],{erlang:timestamp(),"starting..."}]);
+	_ ->
+	    try_start(Port+1)
+    end.
 
 accept(ListenSocket,Clients,Status) ->
     case gen_tcp:accept(ListenSocket,100) of
