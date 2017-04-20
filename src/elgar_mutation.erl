@@ -8,7 +8,7 @@
 make_mutants(Pop,Count,Mus) ->
     lists:merge(skel:do([{pool,[{seq,fun(P) -> 
 					     [P | lists:map(fun(_) ->
-								    M = lists:nth(random:uniform(length(Mus)),Mus),
+								    M = lists:nth(rand:uniform(length(Mus)),Mus),
 								    M(P)
 							    end,
 							    lists:seq(1,Count))]

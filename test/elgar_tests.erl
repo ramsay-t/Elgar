@@ -10,7 +10,7 @@ stop_workers(Pids) ->
     lists:map(fun(P) -> P ! terminate end, Pids).
 	
 pick_char() ->
-    lists:nth(random:uniform(5),"abcde").
+    lists:nth(rand:uniform(5),"abcde").
 	    
 string_gen(Seed) ->
     case lists:seq(1,trunc(Seed*10)) of
@@ -66,7 +66,7 @@ string_m2(S) ->
     [pick_char() | S].
 string_m3(S) ->
     if length(S) > 1 ->
-	    N = random:uniform(length(S))-1,
+	    N = rand:uniform(length(S))-1,
 	    {A,B} = lists:split(N,S),
 	    A ++ [pick_char()] ++ tl(B);
        true ->
@@ -76,9 +76,9 @@ string_m4(S) ->
     if length(S) < 2 -> 
 	    S;
        true ->
-	    N = random:uniform(length(S))-1,
+	    N = rand:uniform(length(S))-1,
 	    {A,B} = lists:split(N,S),
-	    case random:uniform(2) of
+	    case rand:uniform(2) of
 		1 ->
 		    A;
 		2 ->
@@ -94,13 +94,13 @@ string_cross(P,Q) ->
 		[] ->
 		    {[],[]};
 		_ ->
-		    lists:split(random:uniform(length(P)),P)
+		    lists:split(rand:uniform(length(P)),P)
 	    end,
     {_,S} = case Q of
 		[] ->
 		    {[],[]};
 		_ ->
-		    lists:split(random:uniform(length(Q)),Q)
+		    lists:split(rand:uniform(length(Q)),Q)
 	    end,
     F ++ S.
 

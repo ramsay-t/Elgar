@@ -7,13 +7,13 @@ sc(P,Q) ->
 		[] ->
 		    {[],[]};
 		_ ->
-		    lists:split(random:uniform(length(P)),P)
+		    lists:split(rand:uniform(length(P)),P)
 	    end,
     {_,S} = case Q of
 		[] ->
 		    {[],[]};
 		_ ->
-		    lists:split(random:uniform(length(Q)),Q)
+		    lists:split(rand:uniform(length(Q)),Q)
 	    end,
     F ++ S.
 
