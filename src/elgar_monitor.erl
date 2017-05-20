@@ -9,7 +9,7 @@ start(any) ->
     try_start(5000);
 start(Port) ->
     io:format("Starting Elgar Monitor on port ~p~n",[Port]),
-    {ok, ListenSocket} = gen_tcp:listen(Port,[list,inet]),
+    {ok, ListenSocket} = gen_tcp:listen(Port,[list,inet,{reuseaddr, true}]),
     spawn(?MODULE,accept,[ListenSocket,[],{erlang:timestamp(),"starting..."}]).
 
 try_start(Port) ->
